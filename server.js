@@ -8,14 +8,14 @@ const express = require('express');
 const morgan = require('morgan');
 const mysql = require('mysql');
 const myConnection = require('express-myconnection');
-const bcrypt = require('bcryptjs');
+const bcryptjs = require('bcryptjs');
 const passport = require('passport');
 const flash = require('express-flash');
 const session = require('express-session');
 const methodOverride = require('method-override');
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 16200;
 // to store users 
 const users = [];
 
@@ -24,6 +24,13 @@ app.use(morgan('dev'));
 app.use(express.urlencoded({
     extended: false
 }));
+/* app.use(myConnection(mysql, {
+    host: 'xav-p-mariadb01.xavizus.com',
+    user: 'Moohammad',
+    password: 'oq14XwiHjk9TygJP',
+    database: 'Moohammad',
+    port: 16200
+}, 'single')); */
 app.use(myConnection(mysql, {
     host: 'localhost',
     user: 'root',
@@ -61,7 +68,7 @@ app.use('/crud', checkAuthenticated, crudRouter);
 
 app.get('/', checkAuthenticated, (req, res) => {
     res.render('index.ejs', {
-        name: req.user.name
+        nameVar: req.user.name
     });
 });
 
@@ -81,7 +88,7 @@ app.get('/register', checkNotAuthenticated, (req, res) => {
 
 app.post('/register', checkNotAuthenticated, async (req, res) => {
     try {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10)
+        const hashedPassword = await bcryptjs.hash(req.body.password, 10)
         users.push({
             id: Date.now().toString(),
             name: req.body.name,
